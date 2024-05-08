@@ -94,7 +94,8 @@ class LLM():
                  model_name: str,
                  access_token: str,
                  attention_implementation: str,
-                 device: str) -> None:
+                 device: str,
+                 base_prompt_path: str) -> None:
         """
         Class used for the generation of answers based on a given query/prompt and context.
         Class used Gemma model(s) from the huggingface library.
@@ -116,21 +117,8 @@ class LLM():
         }]
         self.device = device
 
-        self.base_prompt = """"After reviewing the provided news context items formulate an answer. Before answering the query extract essential information relevant to the query. Return only the final answer, omitting the intermediate thought processes. Your answers should be concise, comprehensive, and no longer than 256 tokens, following the style illustrated in these examples:
-        \nExample 1:
-        Query: What was the outcome of the recent presidential election in Lithuania?
-        Answer: The recent presidential election in Lithuania resulted in the re-election of the incumbent president, who secured a second term by a wide margin, reflecting strong public approval. The election saw high voter turnout, underscoring significant civic participation.
-        \nExample 2:
-        Query: How is Lithuania addressing the issue of energy dependence on Russia?
-        Answer: Lithuania is reducing its energy dependence on Russia by diversifying energy sources, including developing a national LNG terminal and increasing renewable energy projects like solar and wind, aligning with EU goals for energy independence.
-        \nExample 3:
-        Query: What are the latest developments in Lithuania's approach to educational reform?
-        Answer: Lithuania's educational reforms focus on enhancing digital literacy, modernizing curricula, and improving teacher salaries. New policies promote technology in education, STEM subjects, and continuous professional development, preparing students for a digital future.
-        Given the context and query below, produce a comprehensive yet succinct answer:
-        Context: {context}
-        \nRelevant Passages: <Extract essential information here>
-        Query: {query}
-        Answer:"""
+        with open(base_prompt_path, 'r') as file:
+            self.base_prompt = file.read()
 
     def format_prompt(self,
                       prompt: str,
@@ -201,7 +189,8 @@ def RAG_LLM_pipeline(query: str,
     llm = LLM(model_name=cfg.LLM_MODEL,
                 access_token=cfg.TOKEN,
                 attention_implementation='sdpa',
-                device=cfg.DEVICE)
+                device=cfg.DEVICE,
+                base_prompt_path=os.path.join(cfg.DATA_DIR, 'base_prompt.txt'))
 
     context = [data for i, (old_rank, data) in rag_index_dict.items()]
     llm.format_prompt(query,
