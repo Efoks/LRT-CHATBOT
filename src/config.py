@@ -14,7 +14,7 @@ EMBEDDING_MODEL = 'all-mpnet-base-v2'
 RERANK_MODEL = 'mixedbread-ai/mxbai-rerank-large-v1'
 LLM_MODEL = 'google/gemma-7b-it'
 
-TOKEN = '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'
+TOKEN = ''
 
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(f'Device: {DEVICE}')
